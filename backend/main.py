@@ -175,7 +175,7 @@ def send_email_alert(order: dict, alert_type: str):
         import resend as resend_lib
         resend_lib.api_key = resend_key
         resend_lib.Emails.send({
-            "from":    "alerts@eyewear-oms.com",
+            "from":    "onboarding@resend.dev",
             "to":      [alert_email],
             "subject": f"⚠️ {alert_type}: Order {order['order_number']}",
             "html": f"""
