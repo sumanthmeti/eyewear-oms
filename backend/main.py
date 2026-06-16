@@ -503,3 +503,34 @@ def predict_breach(bg: BackgroundTasks):
     "at_risk_orders": results,
     "total_at_risk": len(results)
 }
+
+
+
+
+
+@app.get("/test/send-email")
+def test_email():
+    resend_key = os.getenv("RESEND_API_KEY")
+    alert_email = os.getenv("ALERT_EMAIL")
+    if not resend_key or not alert_email:
+        return {"error": "RESEND_API_KEY or ALERT_EMAIL not configured"}
+    try:
+        import resend as resend_lib
+        resend_lib.api_key = resend_key
+        resend_lib.Emails.send({
+            "from":    "onboarding@resend.dev",
+            "to":      [alert_email],
+            "subject": "⚠️ SLA Breach Alert: Eyewear OMS",
+            "html":    """
+                <h2 style='color:#e53e3e'>SLA Breach Alert</h2>
+                <p><b>Order EYE-023</b> has breached SLA by 52 hours.</p>
+                <p><b>Customer:</b> Madhavan Nair</p>
+                <p><b>Store:</b> Chennai</p>
+                <p><b>Stage:</b> QC Failed</p>
+                <p><b>Lens:</b> Progressive 1.74</p>
+                <p><b>Issue:</b> Out of stock + QC failure</p>
+            """
+        })
+        return {"message": f"✅ Test email sent to {alert_email}"}
+    except Exception as e:
+        return {"error": str(e)}
